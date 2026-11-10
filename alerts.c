@@ -1,12 +1,12 @@
 #include "bill.h"
 
-int dateToDays(Date d) {
+static int dateToDays(Date d) {
     return d.year * 365 + d.month * 30 + d.day;
 }
 
-Date getCurrentSystemDate() {
-    time_t now = time(nullptr);
-    tm *ltm = localtime(&now);
+Date getCurrentSystemDate(void) {
+    time_t now = time(NULL);
+    struct tm *ltm = localtime(&now);
 
     Date d;
     d.day   = ltm->tm_mday;
@@ -25,7 +25,7 @@ void checkAndDisplayAlerts(PriorityQueue *pq) {
     int currentDays  = dateToDays(currentDate);
 
     printf("\n======================================================================\n");
-    printf("              AI-POWERED BILL RISK & URGENCY MATRIX                    \n");
+    printf("              BILL RISK & URGENCY MATRIX                              \n");
     printf("              (Based on System Date: %02d-%02d-%04d)                   \n",
            currentDate.day, currentDate.month, currentDate.year);
     printf("======================================================================\n");
@@ -40,6 +40,7 @@ void checkAndDisplayAlerts(PriorityQueue *pq) {
 
         char bar[12];
         int filled = 0;
+
         if (diff < 0) {
             filled = 10;
         } else if (diff == 0) {
@@ -56,16 +57,16 @@ void checkAndDisplayAlerts(PriorityQueue *pq) {
         }
         bar[10] = '\0';
 
-        printf("%-4d %-14s ₹%-9.2f %02d-%02d-%04d [%s] ",
+        printf("%-4d %-14s Rs%-9.2f %02d-%02d-%04d [%s] ",
                b.billId, b.billName, b.amount,
                b.dueDate.day, b.dueDate.month, b.dueDate.year, bar);
 
         if (diff < 0) {
-            printf("\033[1;31mOVERDUE (%dd) 🔴\033[0m\n", -diff);
+            printf("\033[1;31mOVERDUE (%dd)\033[0m\n", -diff);
         } else if (diff <= 3) {
-            printf("\033[1;33mDUE SOON (%dd) 🟡\033[0m\n", diff);
+            printf("\033[1;33mDUE SOON (%dd)\033[0m\n", diff);
         } else {
-            printf("\033[1;32mUPCOMING (%dd) 🟢\033[0m\n", diff);
+            printf("\033[1;32mUPCOMING (%dd)\033[0m\n", diff);
         }
     }
     printf("======================================================================\n");

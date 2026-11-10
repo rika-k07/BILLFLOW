@@ -10,18 +10,19 @@ void initQueue(PriorityQueue *pq) {
     pq->size = 0;
 }
 
-void swap(Bill *a, Bill *b) {
+static void swap(Bill *a, Bill *b) {
     Bill temp = *a;
     *a = *b;
     *b = temp;
 }
 
 int insertBill(PriorityQueue *pq, Bill newBill) {
-    if (pq->size >= MAX) return 0; // Overflow check
+    if (pq->size >= MAX) return 0;   /* Overflow */
+
     int i = pq->size++;
     pq->heap[i] = newBill;
 
-    // Heapify Up (Min-Heap based on due date: earliest date bubbles to root)
+    /* Heapify Up (Min-Heap based on due date) */
     while (i > 0) {
         int parent = (i - 1) / 2;
         if (compareDates(pq->heap[i].dueDate, pq->heap[parent].dueDate) < 0) {
@@ -42,6 +43,7 @@ Bill extractMostUrgent(PriorityQueue *pq) {
     Bill root = pq->heap[0];
     pq->heap[0] = pq->heap[--pq->size];
 
+    /* Heapify Down */
     int i = 0;
     while (2 * i + 1 < pq->size) {
         int left = 2 * i + 1;

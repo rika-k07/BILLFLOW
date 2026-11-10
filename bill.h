@@ -3,7 +3,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <ctime>
+#include <stdbool.h>
+#include <time.h>
 
 #define MAX 100
 
@@ -25,18 +26,18 @@ typedef struct {
     int size;
 } PriorityQueue;
 
-// Heap functions
+/* Heap functions */
 int compareDates(Date d1, Date d2);
 void initQueue(PriorityQueue *pq);
 int insertBill(PriorityQueue *pq, Bill newBill);
 Bill peekMostUrgent(PriorityQueue *pq);
 Bill extractMostUrgent(PriorityQueue *pq);
 
-// Alert functions (single parameter)
-Date getCurrentSystemDate();
+/* Alert functions */
+Date getCurrentSystemDate(void);
 void checkAndDisplayAlerts(PriorityQueue *pq);
 
-// Interface
+/* Interface helpers (defined in main.c) */
 void seedSampleData(PriorityQueue *pq);
 void displayAllBillsFormatted(PriorityQueue *pq);
 

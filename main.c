@@ -1,4 +1,8 @@
 #include "bill.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#include <time.h>
 
 void seedSampleData(PriorityQueue *pq) {
     Bill b1 = {101, "Hostel WiFi", 599.00f, {5, 11, 2026}};
@@ -16,10 +20,10 @@ void displayAllBillsFormatted(PriorityQueue *pq) {
         return;
     }
     printf("\n------------------------------------------------------\n");
-    printf("ID   Bill Name        Amount (₹)    Due Date\n");
+    printf("ID   Bill Name        Amount (Rs)   Due Date\n");
     printf("------------------------------------------------------\n");
     for (int i = 0; i < pq->size; i++) {
-        printf("%-4d %-16s ₹%-11.2f %02d-%02d-%04d\n",
+        printf("%-4d %-16s Rs%-10.2f %02d-%02d-%04d\n",
                pq->heap[i].billId,
                pq->heap[i].billName,
                pq->heap[i].amount,
@@ -30,8 +34,8 @@ void displayAllBillsFormatted(PriorityQueue *pq) {
     printf("------------------------------------------------------\n");
 }
 
-void printCurrentDateTime() {
-    time_t now = time(nullptr);
+void printCurrentDateTime(void) {
+    time_t now = time(NULL);
     char buf[64];
     strftime(buf, sizeof(buf), "%d-%m-%Y  %H:%M:%S", localtime(&now));
     printf("System Date & Time : %s\n", buf);
@@ -63,40 +67,44 @@ bool readValidDate(Date *date) {
     int day, month, year;
     int consumed = 0;
 
-    while (1) {
-        printf("Enter Due Date (DD MM YYYY): ");
-        if (!fgets(input, sizeof(input), stdin)) {
-            printf("[!] Input error. Please enter the correct format: DD MM YYYY (example: 25 11 2026)\n");
-            return false;
-        }
+    printf("Enter Due Date (DD MM YYYY): ");
+    fflush(stdout);
 
-        input[strcspn(input, "\r\n")] = '\0';
-        if (sscanf(input, "%d %d %d %n", &day, &month, &year, &consumed) != 3) {
-            printf("[!] Invalid date format. Please enter the correct format: DD MM YYYY (example: 25 11 2026)\n");
-            continue;
-        }
-
-        char *remaining = input + consumed;
-        while (*remaining == ' ' || *remaining == '\t') {
-            remaining++;
-        }
-        if (*remaining != '\0') {
-            printf("[!] Invalid date format. Please enter the correct format: DD MM YYYY (example: 25 11 2026)\n");
-            continue;
-        }
-
-        Date candidate = {day, month, year};
-        if (!isValidDate(candidate)) {
-            printf("[!] Invalid date value. Please enter a real date in DD MM YYYY format (example: 25 11 2026)\n");
-            continue;
-        }
-
-        *date = candidate;
-        return true;
+    if (!fgets(input, sizeof(input), stdin)) {
+        printf("[!] Input error. Please enter the correct format: DD MM YYYY (example: 25 11 2026)\n");
+        return false;
     }
+
+    // Remove trailing newline / carriage return
+    input[strcspn(input, "\r\n")] = '\0';
+
+    // Must parse exactly 3 integers
+    if (sscanf(input, "%d %d %d %n", &day, &month, &year, &consumed) != 3) {
+        printf("[!] Invalid date format. Please enter the correct format: DD MM YYYY (example: 25 11 2026)\n");
+        return false;
+    }
+
+    // Reject any extra characters after the three numbers
+    char *remaining = input + consumed;
+    while (*remaining == ' ' || *remaining == '\t') {
+        remaining++;
+    }
+    if (*remaining != '\0') {
+        printf("[!] Invalid date format. Please enter the correct format: DD MM YYYY (example: 25 11 2026)\n");
+        return false;
+    }
+
+    Date candidate = {day, month, year};
+    if (!isValidDate(candidate)) {
+        printf("[!] Invalid date value. Please enter a real date in DD MM YYYY format (example: 25 11 2026)\n");
+        return false;
+    }
+
+    *date = candidate;
+    return true;
 }
 
-int main() {
+int main(void) {
     PriorityQueue pq;
     initQueue(&pq);
     seedSampleData(&pq);
@@ -115,6 +123,7 @@ int main() {
         printf("5. Pay / Process Most Urgent Bill\n");
         printf("6. Exit\n");
         printf("Enter your choice: ");
+        fflush(stdout);
 
         if (scanf("%d", &choice) != 1) {
             while (getchar() != '\n');
@@ -128,10 +137,12 @@ int main() {
                 scanf("%d", &b.billId);
                 printf("Enter Bill Name: ");
                 scanf("%49s", b.billName);
-                printf("Enter Amount (₹): ");
+                printf("Enter Amount (Rs): ");
                 scanf("%f", &b.amount);
 
+                // Clear leftover newline from scanf
                 while (getchar() != '\n');
+
                 if (!readValidDate(&b.dueDate)) {
                     printf("[!] Bill not added. Please try again with the correct date format.\n");
                     break;
@@ -147,7 +158,7 @@ int main() {
             case 2:
                 if (pq.size > 0) {
                     Bill urgent = peekMostUrgent(&pq);
-                    printf("\n[Top Heap Root] Most Urgent -> ID: %d, Name: %s, Amount: ₹%.2f, Due: %02d-%02d-%04d\n",
+                    printf("\n[Top Heap Root] Most Urgent -> ID: %d, Name: %s, Amount: Rs%.2f, Due: %02d-%02d-%04d\n",
                            urgent.billId, urgent.billName, urgent.amount,
                            urgent.dueDate.day, urgent.dueDate.month, urgent.dueDate.year);
                 } else {
@@ -163,7 +174,7 @@ int main() {
             case 5:
                 if (pq.size > 0) {
                     Bill paid = extractMostUrgent(&pq);
-                    printf("\n[✔] Successfully Paid & Removed: %s (₹%.2f) due on %02d-%02d-%04d\n",
+                    printf("\n[OK] Successfully Paid & Removed: %s (Rs%.2f) due on %02d-%02d-%04d\n",
                            paid.billName, paid.amount,
                            paid.dueDate.day, paid.dueDate.month, paid.dueDate.year);
                 } else {
