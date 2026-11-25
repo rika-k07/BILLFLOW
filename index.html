@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>Billflow — Bill reminders, made simple</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="#" aria-label="Billflow home">
+        <span class="brand-mark" aria-hidden="true">B</span>
+        <span>billflow<span class="brand-period">.</span></span>
+      </a>
+
+      <div class="nav-caption">WORKSPACE</div>
+      <nav class="navigation">
+        <a class="nav-link active" href="#overview" aria-current="page">
+          <span class="nav-icon" aria-hidden="true">▦</span> Overview
+        </a>
+        <a class="nav-link" href="#bills">
+          <span class="nav-icon" aria-hidden="true">▤</span> My bills
+          <span class="nav-count" id="nav-count">0</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-tip">
+          <span class="tip-icon" aria-hidden="true">✦</span>
+          <strong>Stay one step ahead</strong>
+          <p>Keep your bills in one place and never miss a due date.</p>
+        </div>
+        <div class="profile">
+          <span class="avatar" aria-hidden="true">Y</span>
+          <span class="profile-copy"><strong>Your workspace</strong><small>Personal account</small></span>
+          <span class="profile-menu" aria-hidden="true">···</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content" id="overview">
+      <header class="topbar">
+        <div class="breadcrumb"><span>Workspace</span><span class="breadcrumb-divider">/</span><strong>Overview</strong></div>
+        <div class="topbar-actions">
+          <span class="today-label"><span class="live-dot" aria-hidden="true"></span><span id="today-date"></span></span>
+          <button class="button button-primary button-small" id="open-add" type="button">
+            <span aria-hidden="true">＋</span> Add a bill
+          </button>
+        </div>
+      </header>
+
+      <section class="page-heading">
+        <div>
+          <p class="eyebrow">YOUR FINANCES, AT A GLANCE</p>
+          <h1>Good to see you<span class="heading-period">.</span></h1>
+          <p class="heading-description">Here’s what’s happening with your bills.</p>
+        </div>
+      </section>
+
+      <section class="summary-grid" aria-label="Bill summary">
+        <article class="summary-card total-card">
+          <div class="card-topline"><span class="summary-label">Total upcoming</span><span class="summary-icon violet" aria-hidden="true">↗</span></div>
+          <div class="summary-value" id="total-upcoming">₹0</div>
+          <div class="summary-foot"><span class="metric-dot violet-dot"></span><span id="total-count">0 bills</span> to keep track of</div>
+        </article>
+        <article class="summary-card">
+          <div class="card-topline"><span class="summary-label">Due this week</span><span class="summary-icon orange" aria-hidden="true">◷</span></div>
+          <div class="summary-value" id="due-week">₹0</div>
+          <div class="summary-foot"><span class="metric-dot orange-dot"></span><span id="due-week-count">0 bills</span> in the next 7 days</div>
+        </article>
+        <article class="summary-card">
+          <div class="card-topline"><span class="summary-label">Needs attention</span><span class="summary-icon red" aria-hidden="true">!</span></div>
+          <div class="summary-value" id="needs-attention">0</div>
+          <div class="summary-foot"><span class="metric-dot red-dot"></span>Overdue or due soon</div>
+        </article>
+        <article class="summary-card">
+          <div class="card-topline"><span class="summary-label">All caught up</span><span class="summary-icon green" aria-hidden="true">✓</span></div>
+          <div class="summary-value" id="caught-up">0</div>
+          <div class="summary-foot"><span class="metric-dot green-dot"></span>Paid bills this month</div>
+        </article>
+      </section>
+
+      <section class="urgent-panel" id="urgent-panel" aria-live="polite">
+        <div class="urgent-symbol" aria-hidden="true">!</div>
+        <div class="urgent-copy">
+          <span class="urgent-kicker">UP NEXT</span>
+          <h2 id="urgent-title">You’re all caught up</h2>
+          <p id="urgent-detail">Add a bill to see your next payment here.</p>
+        </div>
+        <button class="button button-light" id="pay-urgent" type="button" hidden>Mark as paid <span aria-hidden="true">→</span></button>
+        <span class="urgent-decoration" aria-hidden="true">↗</span>
+      </section>
+
+      <section class="bills-section" id="bills">
+        <div class="section-header">
+          <div>
+            <h2>Your bills <span class="section-count" id="section-count">0</span></h2>
+            <p>Stay on top of every payment.</p>
+          </div>
+          <div class="table-actions">
+            <label class="search-box">
+              <span aria-hidden="true">⌕</span>
+              <span class="visually-hidden">Search bills</span>
+              <input id="search-bills" type="search" placeholder="Search bills..." autocomplete="off">
+            </label>
+            <label class="filter-wrap">
+              <span class="visually-hidden">Filter bills</span>
+              <select id="bill-filter" aria-label="Filter bills">
+                <option value="all">All bills</option>
+                <option value="attention">Needs attention</option>
+                <option value="upcoming">Upcoming</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th scope="col">BILL NAME</th><th scope="col">DUE DATE</th><th scope="col">URGENCY</th><th scope="col">AMOUNT</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr>
+            </thead>
+            <tbody id="bill-rows"></tbody>
+          </table>
+          <div class="empty-state" id="empty-state" hidden>
+            <span class="empty-icon" aria-hidden="true">▤</span>
+            <strong>No bills found</strong>
+            <p>Try changing your search or add a new bill.</p>
+            <button class="button button-primary button-small" type="button" id="empty-add">Add a bill</button>
+          </div>
+        </div>
+        <div class="table-footer"><span id="table-summary"></span><span class="footer-note"><span class="live-dot" aria-hidden="true"></span> Reminders are up to date</span></div>
+      </section>
+
+      <footer class="page-footer"><span>Made for a little more peace of mind.</span><span>Billflow <span class="brand-period">•</span> Personal bill tracker</span></footer>
+    </main>
+  </div>
+
+  <dialog class="bill-dialog" id="bill-dialog" aria-labelledby="dialog-title">
+    <form id="bill-form">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">KEEP IT ORGANIZED</p><h2 id="dialog-title">Add a bill</h2></div>
+        <button class="icon-button" id="close-dialog" type="button" aria-label="Close dialog">×</button>
+      </div>
+      <label class="form-field">Bill name<input id="bill-name" name="name" type="text" maxlength="49" placeholder="e.g. Internet" required></label>
+      <div class="form-row">
+        <label class="form-field">Amount (₹)<input name="amount" type="number" min="0.01" step="0.01" placeholder="0.00" required></label>
+        <label class="form-field">Due date<input name="dueDate" type="date" required><span class="field-hint">Choose today or a future date.</span></label>
+      </div>
+      <p class="form-error" id="form-error" role="alert" hidden></p>
+      <div class="dialog-actions">
+        <button class="button button-quiet" id="cancel-dialog" type="button">Cancel</button>
+        <button class="button button-primary" type="submit">Add bill</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
